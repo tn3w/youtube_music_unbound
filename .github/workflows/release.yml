@@ -88,17 +88,18 @@ jobs:
           Section "Install"
             SetOutPath "`$INSTDIR"
             File /r "build\windows\x64\runner\Release\*.*"
+            File "assets\icons\icon.ico"
             
             WriteUninstaller "`$INSTDIR\uninstall.exe"
             
             CreateDirectory "`$SMPROGRAMS\YouTube Music Unbound"
-            CreateShortcut "`$SMPROGRAMS\YouTube Music Unbound\YouTube Music Unbound.lnk" "`$INSTDIR\${{ env.APP_NAME }}.exe" "" "assets\icons\icon.ico"
+            CreateShortcut "`$SMPROGRAMS\YouTube Music Unbound\YouTube Music Unbound.lnk" "`$INSTDIR\${{ env.APP_NAME }}.exe" "" "`$INSTDIR\icon.ico" 0 SW_SHOWNORMAL "`$INSTDIR"
             CreateShortcut "`$SMPROGRAMS\YouTube Music Unbound\Uninstall.lnk" "`$INSTDIR\uninstall.exe"
-            CreateShortcut "`$DESKTOP\YouTube Music Unbound.lnk" "`$INSTDIR\${{ env.APP_NAME }}.exe" "" "assets\icons\icon.ico"
+            CreateShortcut "`$DESKTOP\YouTube Music Unbound.lnk" "`$INSTDIR\${{ env.APP_NAME }}.exe" "" "`$INSTDIR\icon.ico" 0 SW_SHOWNORMAL "`$INSTDIR"
             
             WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${{ env.APP_NAME }}" "DisplayName" "YouTube Music Unbound"
             WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${{ env.APP_NAME }}" "UninstallString" "`$INSTDIR\uninstall.exe"
-            WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${{ env.APP_NAME }}" "DisplayIcon" "`$INSTDIR\${{ env.APP_NAME }}.exe"
+            WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${{ env.APP_NAME }}" "DisplayIcon" "`$INSTDIR\icon.ico"
             WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${{ env.APP_NAME }}" "DisplayVersion" "$version"
             WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${{ env.APP_NAME }}" "Publisher" "YouTube Music Unbound"
           SectionEnd
