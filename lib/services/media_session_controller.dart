@@ -51,7 +51,7 @@ class _AndroidController implements MediaSessionController {
         config: const AudioServiceConfig(
           androidNotificationChannelId: 'com.youtube_music_unbound.channel',
           androidNotificationChannelName: 'YouTube Music Unbound',
-          androidNotificationOngoing: true,
+          androidNotificationOngoing: false,
           androidShowNotificationBadge: true,
           androidStopForegroundOnPause: false,
           androidNotificationClickStartsActivity: true,

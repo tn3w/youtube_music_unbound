@@ -277,7 +277,6 @@ class _WebViewContainerState extends State<WebViewContainer>
 
       await _setupJavaScriptHandlers(controller);
 
-      // Only inject titlebar CSS on desktop platforms
       if (_isDesktop) {
         await _injectTransparentTitleBarCSS(controller);
       }
