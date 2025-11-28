@@ -112,6 +112,7 @@ jobs:
           "@ | Out-File -FilePath installer.nsi -Encoding UTF8
           
           choco install nsis -y
+          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
           makensis installer.nsi
       
       - name: Upload Windows artifacts
