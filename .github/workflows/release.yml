@@ -112,8 +112,7 @@ jobs:
           "@ | Out-File -FilePath installer.nsi -Encoding UTF8
           
           choco install nsis -y
-          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-          makensis installer.nsi
+          & "$env:ProgramFiles(x86)\NSIS\makensis.exe" installer.nsi
       
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
@@ -181,8 +180,9 @@ jobs:
           Categories=Audio;Music;Player;AudioVideo;
           EOF
           
+          DEB_PACKAGE_NAME=$(echo "${{ env.APP_NAME }}" | tr '_' '-')
           cat > deb/DEBIAN/control << EOF
-          Package: ${{ env.APP_NAME }}
+          Package: ${DEB_PACKAGE_NAME}
           Version: ${{ steps.version.outputs.VERSION }}
           Section: sound
           Priority: optional
