@@ -231,7 +231,7 @@ jobs:
           Categories=Audio;Music;Player;AudioVideo;
           EOF
           
-          ./appimagetool-x86_64.AppImage AppDir ${{ env.APP_NAME }}-${{ github.ref_name }}-linux.AppImage
+          ARCH=x86_64 ./appimagetool-x86_64.AppImage AppDir ${{ env.APP_NAME }}-${{ github.ref_name }}-linux.AppImage
       
       - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
