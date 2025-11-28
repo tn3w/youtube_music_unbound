@@ -112,7 +112,7 @@ jobs:
           "@ | Out-File -FilePath installer.nsi -Encoding UTF8
           
           choco install nsis -y
-          & "$env:ProgramFiles(x86)\NSIS\makensis.exe" installer.nsi
+          & "${env:ProgramFiles(x86)}\NSIS\makensis.exe" installer.nsi
       
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
