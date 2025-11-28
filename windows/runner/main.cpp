@@ -1,6 +1,7 @@
 #include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
 #include <windows.h>
+#include <winrt/base.h>
 
 #include "flutter_window.h"
 #include "utils.h"
@@ -13,9 +14,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
     CreateAndAttachConsole();
   }
 
-  // Initialize COM, so that it is available for use in the library and/or
-  // plugins.
+  // Initialize COM as STA (required by WebView2 and other plugins)
   ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+  
+  // Initialize WinRT without reinitializing COM
+  winrt::init_apartment(winrt::apartment_type::single_threaded);
 
   flutter::DartProject project(L"data");
 
@@ -38,6 +41,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
     ::DispatchMessage(&msg);
   }
 
+  winrt::uninit_apartment();
   ::CoUninitialize();
   return EXIT_SUCCESS;
 }
