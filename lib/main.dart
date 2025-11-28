@@ -100,7 +100,7 @@ class _WebViewContainerState extends State<WebViewContainer>
   }
 
   void _initializeMediaSession() {
-    if (!_isDesktop && !Platform.isAndroid) return;
+    if (!_isDesktop && !Platform.isAndroid && !Platform.isIOS) return;
 
     try {
       _mediaSessionController = createMediaSessionController();
@@ -220,28 +220,41 @@ class _WebViewContainerState extends State<WebViewContainer>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          RepaintBoundary(
-            child: InAppWebView(
-              initialUrlRequest: URLRequest(url: WebUri(_youtubeMusicUrl)),
-              initialSettings: _getWebViewSettings(),
-              onWebViewCreated: _onWebViewCreated,
-              onLoadStop: _onLoadStop,
-              onReceivedError: _onReceivedError,
-              onReceivedHttpError: _onReceivedHttpError,
-              shouldInterceptRequest: _shouldInterceptRequest,
+      body: _isMobile
+          ? RepaintBoundary(
+              child: InAppWebView(
+                initialUrlRequest: URLRequest(url: WebUri(_youtubeMusicUrl)),
+                initialSettings: _getWebViewSettings(),
+                onWebViewCreated: _onWebViewCreated,
+                onLoadStop: _onLoadStop,
+                onReceivedError: _onReceivedError,
+                onReceivedHttpError: _onReceivedHttpError,
+                shouldInterceptRequest: _shouldInterceptRequest,
+              ),
+            )
+          : Stack(
+              children: [
+                RepaintBoundary(
+                  child: InAppWebView(
+                    initialUrlRequest: URLRequest(
+                      url: WebUri(_youtubeMusicUrl),
+                    ),
+                    initialSettings: _getWebViewSettings(),
+                    onWebViewCreated: _onWebViewCreated,
+                    onLoadStop: _onLoadStop,
+                    onReceivedError: _onReceivedError,
+                    onReceivedHttpError: _onReceivedHttpError,
+                    shouldInterceptRequest: _shouldInterceptRequest,
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: _buildCustomTitleBar(context),
+                ),
+              ],
             ),
-          ),
-          if (_isDesktop)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: _buildCustomTitleBar(context),
-            ),
-        ],
-      ),
     );
   }
 
@@ -264,6 +277,7 @@ class _WebViewContainerState extends State<WebViewContainer>
 
       await _setupJavaScriptHandlers(controller);
 
+      // Only inject titlebar CSS on desktop platforms
       if (_isDesktop) {
         await _injectTransparentTitleBarCSS(controller);
       }
@@ -297,6 +311,8 @@ class _WebViewContainerState extends State<WebViewContainer>
       // Ignore load stop errors
     }
   }
+
+  bool get _isMobile => Platform.isAndroid || Platform.isIOS;
 
   void _onReceivedError(
     InAppWebViewController controller,

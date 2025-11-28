@@ -29,23 +29,41 @@ class _AndroidController implements MediaSessionController {
   final _commands = StreamController<MediaCommand>.broadcast();
   AudioHandler? _handler;
   bool _initialized = false;
+  Completer<void>? _initCompleter;
 
   @override
   Stream<MediaCommand> get commandStream => _commands.stream;
 
+  _AndroidController() {
+    _init();
+  }
+
   Future<void> _init() async {
     if (_initialized) return;
-    _handler = await AudioService.init(
-      builder: () => _AudioHandler(_commands),
-      config: AudioServiceConfig(
-        androidNotificationChannelId: 'com.youtube_music_unbound.ch',
-        androidNotificationChannelName: 'YouTube Music Unbound',
-        androidNotificationOngoing: true,
-        androidShowNotificationBadge: true,
-        androidStopForegroundOnPause: false,
-      ),
-    );
-    _initialized = true;
+    if (_initCompleter != null) {
+      await _initCompleter!.future;
+      return;
+    }
+    _initCompleter = Completer<void>();
+    try {
+      _handler = await AudioService.init(
+        builder: () => _AudioHandler(_commands),
+        config: const AudioServiceConfig(
+          androidNotificationChannelId: 'com.youtube_music_unbound.channel',
+          androidNotificationChannelName: 'YouTube Music Unbound',
+          androidNotificationOngoing: true,
+          androidShowNotificationBadge: true,
+          androidStopForegroundOnPause: false,
+          androidNotificationClickStartsActivity: true,
+          androidResumeOnClick: true,
+        ),
+      );
+      _initialized = true;
+      _initCompleter!.complete();
+    } catch (e) {
+      _initCompleter!.completeError(e);
+      _initCompleter = null;
+    }
   }
 
   @override
@@ -61,6 +79,7 @@ class _AndroidController implements MediaSessionController {
             ? Uri.parse(metadata.artworkUrl!)
             : null,
         duration: metadata.duration,
+        playable: true,
       );
       if (_handler is _AudioHandler) {
         (_handler as _AudioHandler).setMediaItem(item);
@@ -84,6 +103,10 @@ class _AndroidController implements MediaSessionController {
           MediaAction.seek,
           MediaAction.seekForward,
           MediaAction.seekBackward,
+          MediaAction.play,
+          MediaAction.pause,
+          MediaAction.skipToNext,
+          MediaAction.skipToPrevious,
         },
         androidCompactActionIndices: const [0, 1, 2],
         processingState: _toProcessingState(state),
@@ -123,6 +146,7 @@ class _AndroidController implements MediaSessionController {
   @override
   Future<void> dispose() async {
     await _commands.close();
+    await _handler?.stop();
     _handler = null;
   }
 }
